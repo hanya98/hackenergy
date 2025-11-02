@@ -1,0 +1,1323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GeoMint - AI Attendance & Payroll</title>
+    
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Lucide Icons -->
+    <script src="https://unpkg.com/lucide-icons"></script>
+    
+    <!-- Load ApexCharts for graphs -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    
+    <!-- Load Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        /* Define custom fonts and colors */
+        :root {
+            --color-primary: #004D40; /* Deep Forest Green */
+            --color-accent: #C27C36;  /* Warm Bronze */
+            --color-secondary: #69A197; /* Muted Teal/Sage */
+            --color-text: #444B59;    /* Charcoal */
+            --color-background: #F7FDFD; /* Off-White/Mint Cream */
+            --color-error: #EF4444;
+            --color-success: #10B981;
+            
+            --color-dark-bg: #121212;
+            --color-dark-card: #1F2937;
+            --color-dark-text: #E5E7EB;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--color-text);
+            background-color: var(--color-background);
+        }
+
+        .font-montserrat {
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        /* Custom Tailwind color mapping */
+        .bg-primary { background-color: var(--color-primary); }
+        .bg-accent { background-color: var(--color-accent); }
+        .bg-secondary { background-color: var(--color-secondary); }
+        .bg-error { background-color: var(--color-error); }
+        .bg-success { background-color: var(--color-success); }
+        
+        .text-primary { color: var(--color-primary); }
+        .text-accent { color: var(--color-accent); }
+        .text-secondary { color: var(--color-secondary); }
+        
+        .border-primary { border-color: var(--color-primary); }
+        .border-accent { border-color: var(--color-accent); }
+        .border-secondary { border-color: var(--color-secondary); }
+        
+        .fill-accent { fill: var(--color-accent); }
+
+        /* Dark Mode Styles */
+        html.dark {
+            background-color: var(--color-dark-bg);
+            color: var(--color-dark-text);
+        }
+        html.dark body {
+            background-color: var(--color-dark-bg);
+            color: var(--color-dark-text);
+        }
+        html.dark .card {
+            background-color: var(--color-dark-card);
+            color: var(--color-dark-text);
+        }
+        html.dark .sidebar {
+             background-color: var(--color-dark-card);
+        }
+        html.dark .sidebar-title-border {
+             border-color: #4B5563; /* gray-600 */
+        }
+        html.dark .sidebar-section-border {
+             border-color: #374151; /* gray-700 */
+        }
+        html.dark .sidebar-text-muted {
+            color: #9CA3AF; /* gray-400 */
+        }
+        html.dark .nav-item {
+            color: #D1D5DB; /* gray-300 */
+        }
+        html.dark .nav-item:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        html.dark .nav-item-active {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--color-accent);
+            border-left-color: var(--color-accent);
+        }
+        html.dark .dark-mode-toggle-bg {
+            background-color: #374151; /* gray-700 */
+        }
+        
+        html.dark .top-navbar {
+            background-color: var(--color-dark-bg);
+            border-bottom-color: #374151; /* gray-700 */
+        }
+        
+        html.dark .placeholder-map {
+             background-color: #374151; /* gray-700 */
+             color: #9CA3AF; /* gray-400 */
+        }
+        
+        html.dark .table-header {
+             background-color: #374151; /* gray-700 */
+        }
+        html.dark .table-header th {
+            color: #D1D5DB; /* gray-300 */
+        }
+        html.dark .table-body {
+            border-color: #374151; /* gray-700 */
+        }
+        html.dark .table-row:hover {
+            background-color: #1F2937; /* gray-800 */
+        }
+         html.dark .table-text-muted {
+            color: #D1D5DB; /* gray-300 */
+        }
+        html.dark .text-gray-500 {
+            color: #9CA3AF; /* gray-400 */
+        }
+         html.dark .text-gray-600 {
+            color: #D1D5DB; /* gray-300 */
+        }
+        html.dark .bg-gray-50 {
+             background-color: #374151; /* gray-700 */
+        }
+        html.dark .bg-gray-200 {
+             background-color: #4B5563; /* gray-600 */
+        }
+        html.dark .text-gray-600 {
+            color: #E5E7EB; /* gray-200 */
+        }
+        html.dark .border-gray-200 {
+            border-color: #374151; /* gray-700 */
+        }
+         html.dark .divide-gray-200 > :not([hidden]) ~ :not([hidden]) {
+            border-color: #374151; /* gray-700 */
+        }
+        html.dark .input-field {
+            background-color: #374151; /* gray-700 */
+            border-color: #4B5563; /* gray-600 */
+            color: white;
+        }
+
+        /* Chart Dark Mode */
+        html.dark .apexcharts-tooltip {
+            background: #1F2937 !important;
+            border: 1px solid #374151 !important;
+            color: white !important;
+        }
+        html.dark .apexcharts-tooltip .apexcharts-tooltip-title {
+            background: #374151 !important;
+            border-bottom: 1px solid #4B5563 !important;
+        }
+        html.dark .apexcharts-xaxis-label,
+        html.dark .apexcharts-yaxis-label,
+        html.dark .apexcharts-legend-text {
+            fill: #9CA3AF !important; /* gray-400 */
+        }
+        html.dark .apexcharts-title-text {
+             fill: white !important;
+        }
+        html.dark .apexcharts-gridline {
+            stroke: #374151 !important; /* gray-700 */
+        }
+        html.dark .apexcharts-radialbar-track-area {
+            stroke: #374151 !important; /* gray-700 */
+        }
+        html.dark .apexcharts-pie-label {
+            fill: white !important;
+            filter: none !important;
+        }
+
+
+        /* Component Styles */
+        .card {
+            background-color: white;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border-radius: 20px;
+            padding: 1.5rem; /* p-6 */
+            transition: box-shadow 0.3s ease-in-out;
+        }
+        .card:hover {
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem; /* py-3 px-6 */
+            border-radius: 0.75rem; /* rounded-xl */
+            font-weight: 600; /* font-semibold */
+            transition: all 0.3s ease-in-out;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        .btn:active {
+            transform: scale(0.98);
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background-color: var(--color-primary);
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: var(--color-secondary);
+        }
+
+        .btn-accent {
+            background-color: var(--color-accent);
+            color: var(--color-primary);
+        }
+        .btn-accent:hover {
+            opacity: 0.9;
+        }
+
+        .btn-ghost {
+            background-color: transparent;
+            color: var(--color-primary);
+            box-shadow: none;
+        }
+        html.dark .btn-ghost {
+            color: var(--color-dark-text);
+        }
+        .btn-ghost:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+        html.dark .btn-ghost:hover {
+             background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-danger {
+            background-color: var(--color-error);
+            color: white;
+        }
+        .btn-danger:hover {
+            background-color: #DC2626; /* red-600 */
+        }
+        
+        /* Grid Background Pattern */
+        .grid-pattern {
+            position: absolute;
+            inset: 0;
+            opacity: 0.1;
+            background-image: linear-gradient(to right, var(--color-primary) 1px, transparent 1px), linear-gradient(to bottom, var(--color-primary) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeIn { animation: fadeIn 0.3s ease-out; }
+        .animate-slideUp { animation: slideUp 0.3s ease-out; }
+
+        /* Hide elements by default */
+        .page-view {
+            display: none;
+        }
+    </style>
+</head>
+<body class="transition-colors duration-500">
+
+    <!-- 
+    ==========================================
+    LANDING PAGE VIEW
+    ==========================================
+    -->
+    <div id="landing-page" class="page-view min-h-screen flex items-center justify-center p-4 bg-primary transition-opacity duration-500">
+        <div class="grid-pattern" style="opacity: 0.05;"></div>
+        <div class="card max-w-4xl w-full text-center p-10 relative z-10 animate-slideUp">
+            <h1 class="text-5xl font-extrabold font-montserrat mb-4 text-primary">
+                GeoMint <span class="text-accent">—</span> Minting Trust in Workplaces
+            </h1>
+            <p class="text-xl mb-10 text-gray-700">
+                AI-verified attendance and payroll for field teams.
+            </p>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <button data-action="setView" data-view="employee" class="btn btn-accent text-xl py-4 shadow-lg shadow-yellow-200">
+                    <i data-lucide="user" class="inline mr-2 w-6 h-6"></i> Try Employee View
+                </button>
+                <button data-action="setView" data-view="admin" class="btn btn-primary text-xl py-4 shadow-lg shadow-green-200">
+                    <i data-lucide="briefcase" class="inline mr-2 w-6 h-6"></i> Open HR Dashboard
+                </button>
+            </div>
+
+            <div class="mt-12">
+                <h2 class="text-2xl font-bold font-montserrat mb-6 text-primary">Key Features</h2>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                    <div class="p-3 border-2 border-secondary rounded-full flex items-center justify-center space-x-2 text-gray-700 transition duration-300 hover:bg-gray-50">
+                        <i data-lucide="cpu" class="w-5 h-5 text-primary"></i>
+                        <span class="font-semibold">AI Verification</span>
+                    </div>
+                    <div class="p-3 border-2 border-secondary rounded-full flex items-center justify-center space-x-2 text-gray-700 transition duration-300 hover:bg-gray-50">
+                        <i data-lucide="map-pin" class="w-5 h-5 text-primary"></i>
+                        <span class="font-semibold">Adaptive Geofencing</span>
+                    </div>
+                    <div class="p-3 border-2 border-secondary rounded-full flex items-center justify-center space-x-2 text-gray-700 transition duration-300 hover:bg-gray-50">
+                        <i data-lucide="dollar-sign" class="w-5 h-5 text-primary"></i>
+                        <span class="font-semibold">Predictive Payroll</span>
+                    </div>
+                    <div class="p-3 border-2 border-secondary rounded-full flex items-center justify-center space-x-2 text-gray-700 transition duration-300 hover:bg-gray-50">
+                        <i data-lucide="award" class="w-5 h-5 text-primary"></i>
+                        <span class="font-semibold">Gamified Rewards</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 
+    ==========================================
+    EMPLOYEE VIEW
+    ==========================================
+    -->
+    <div id="employee-view" class="page-view min-h-screen flex items-center justify-center p-4">
+        <div class="card w-full max-w-sm p-0 overflow-hidden shadow-2xl relative animate-slideUp">
+            <div class="p-4 flex items-center justify-between text-white bg-primary">
+                <button data-action="setView" data-view="landing" class="text-white">
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                </button>
+                <span class="font-semibold text-lg">GeoMint Field App</span>
+                <i data-lucide="bell" class="w-5 h-5"></i>
+            </div>
+
+            <!-- Mobile Screen Content -->
+            <div class="p-5">
+                <!-- Header Info -->
+                <div class="flex items-center space-x-4 mb-6">
+                    <img src="https://placehold.co/60x60/C27C36/FFFFFF?text=AJ" alt="Profile" class="rounded-full w-14 h-14 object-cover border-4 border-gray-100 shadow-md">
+                    <div>
+                        <h2 class="text-xl font-bold font-montserrat text-primary">Alice Johnson</h2>
+                        <p class="text-sm text-gray-500">ID: E-101A | Trust Index: 98%</p>
+                    </div>
+                </div>
+
+                <!-- Time and Status -->
+                <div class="card mb-6 text-center p-4 bg-gray-50">
+                    <p id="employee-time" class="text-4xl font-extrabold font-montserrat text-primary">00:00:00</p>
+                    <p id="employee-date" class="text-sm text-gray-500">Sunday, Nov 2, 2025</p>
+                </div>
+
+                <!-- Webcam Simulation -->
+                <div id="liveness-ui" class="h-40 w-full rounded-xl overflow-hidden mb-4 border-4 border-gray-100 shadow-inner flex items-center justify-center bg-gray-900 text-gray-500">
+                    <i data-lucide="user" class="w-10 h-10 mr-2"></i>
+                    Webcam Inactive
+                </div>
+
+                <!-- GPS Status -->
+                <p id="gps-status" class="text-center font-semibold text-sm mb-6 text-gray-500">
+                    <i data-lucide="map-pin" class="inline w-4 h-4 mr-1"></i>
+                    Location Status: Verifying...
+                </p>
+
+                <!-- Action Button -->
+                <button id="clock-action-btn" class="btn btn-accent w-full text-lg py-4 shadow-lg">
+                    <i data-lucide="clock" class="inline w-5 h-5 mr-2"></i>
+                    Clock In
+                </button>
+
+                <!-- Current Status -->
+                <p id="clock-status" class="text-center mt-4 text-sm font-medium text-gray-500">
+                    Ready to Clock In
+                </p>
+
+                <!-- Offline Mode Banner -->
+                <div class="mt-8 p-3 text-center text-xs bg-gray-200 text-gray-600 rounded-lg">
+                    <i data-lucide="zap" class="w-3 h-3 inline mr-1"></i> You are offline. Data will sync automatically.
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- 
+    ==========================================
+    ADMIN VIEW
+    ==========================================
+    -->
+    <div id="admin-view" class="page-view flex min-h-screen">
+        
+        <!-- --- Sidebar --- -->
+        <div class="sidebar w-64 min-h-screen p-6 flex flex-col fixed inset-y-0 z-20 bg-primary transition-colors duration-500">
+            <div class="text-3xl font-extrabold font-montserrat mb-10 border-b pb-4 text-white border-white/20 sidebar-title-border">
+                Geo<span class="text-accent">Mint</span>
+            </div>
+
+            <nav class="space-y-2 flex-grow">
+                <div data-action="setPage" data-page="dashboard" class="nav-item flex items-center p-3 rounded-xl cursor-pointer transition-all duration-200">
+                    <i data-lucide="home" class="w-5 h-5 mr-4"></i>
+                    <span>Dashboard</span>
+                </div>
+                <div data-action="setPage" data-page="employees" class="nav-item flex items-center p-3 rounded-xl cursor-pointer transition-all duration-200">
+                    <i data-lucide="users" class="w-5 h-5 mr-4"></i>
+                    <span>Employees</span>
+                </div>
+                <div data-action="setPage" data-page="attendance" class="nav-item flex items-center p-3 rounded-xl cursor-pointer transition-all duration-200">
+                    <i data-lucide="check-square" class="w-5 h-5 mr-4"></i>
+                    <span>Attendance</span>
+                </div>
+                <div data-action="setPage" data-page="payroll" class="nav-item flex items-center p-3 rounded-xl cursor-pointer transition-all duration-200">
+                    <i data-lucide="dollar-sign" class="w-5 h-5 mr-4"></i>
+                    <span>Payroll</span>
+                </div>
+                <div data-action="setPage" data-page="reports" class="nav-item flex items-center p-3 rounded-xl cursor-pointer transition-all duration-200">
+                    <i data-lucide="bar-chart" class="w-5 h-5 mr-4"></i>
+                    <span>Reports & Analytics</span>
+                </div>
+                <div class="h-4"></div>
+                <p class="text-sm font-semibold pt-4 border-t text-white/50 border-white/20 sidebar-section-border sidebar-text-muted">Innovation</p>
+                <div data-action="setPage" data-page="geofencing" class="nav-item flex items-center p-3 rounded-xl cursor-pointer transition-all duration-200">
+                    <i data-lucide="map-pin" class="w-5 h-5 mr-4"></i>
+                    <span>Adaptive Geofencing</span>
+                </div>
+                <div data-action="setPage" data-page="predictive-payroll" class="nav-item flex items-center p-3 rounded-xl cursor-pointer transition-all duration-200">
+                    <i data-lucide="trending-up" class="w-5 h-5 mr-4"></i>
+                    <span>Predictive Payroll</span>
+                </div>
+                <div data-action="setPage" data-page="rewards" class="nav-item flex items-center p-3 rounded-xl cursor-pointer transition-all duration-200">
+                    <i data-lucide="award" class="w-5 h-5 mr-4"></i>
+                    <span>Gamified Rewards</span>
+                </div>
+            </nav>
+
+            <div class="pt-6 border-t border-white/20 mt-6 sidebar-section-border">
+                <div data-action="setPage" data-page="settings" class="nav-item flex items-center p-3 rounded-xl cursor-pointer transition-all duration-200">
+                    <i data-lucide="settings" class="w-5 h-5 mr-4"></i>
+                    <span>Settings</span>
+                </div>
+                <div data-action="setPage" data-page="about" class="nav-item flex items-center p-3 rounded-xl cursor-pointer transition-all duration-200">
+                    <i data-lucide="log-out" class="w-5 h-5 mr-4"></i> <!-- Re-using icon -->
+                    <span>About GeoMint</span>
+                </div>
+                <div class="mt-4 flex justify-between items-center p-2 rounded-xl cursor-pointer text-white/80 bg-white/5 dark-mode-toggle-bg">
+                    <span class="font-semibold text-sm">Dark Mode</span>
+                    <button id="dark-mode-toggle" class="p-1 rounded-full transition duration-300 bg-accent" aria-label="Toggle dark mode">
+                        <i data-lucide="sun" class="w-5 h-5 text-primary"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- --- Main Content --- -->
+        <div class="flex-1 ml-64 p-8 transition-colors duration-500">
+            <!-- Top Navbar -->
+            <div class="top-navbar flex justify-between items-center pb-6 border-b border-gray-200 mb-8 sticky top-0 z-10 bg-background">
+                <h1 id="admin-page-title" class="text-2xl font-extrabold font-montserrat text-primary">DASHBOARD</h1>
+                <div class="flex items-center space-x-6">
+                    <div class="flex items-center space-x-2">
+                        <span id="innovation-mode-label" class="text-sm font-semibold text-accent">Innovation Mode</span>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="innovation-mode-toggle" checked class="sr-only peer">
+                            <div class="w-11 h-6 peer-focus:outline-none rounded-full peer bg-accent after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+                        </label>
+                    </div>
+                    <i data-lucide="bell" class="w-6 h-6 cursor-pointer text-gray-500 hover:text-accent"></i>
+                    <i data-action="setView" data-view="landing" data-lucide="user" class="w-6 h-6 cursor-pointer text-gray-500 hover:text-accent"></i>
+                </div>
+            </div>
+
+            <!-- Page Content Area -->
+            <div id="admin-content-area">
+                <!-- Content will be injected here by JavaScript -->
+            </div>
+
+        </div>
+    </div>
+    
+    <!-- 
+    ==========================================
+    MODAL CONTAINER
+    ==========================================
+    -->
+    <div id="modal-container" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black bg-opacity-50 backdrop-blur-sm transition-opacity duration-300 animate-fadeIn" style="display: none;">
+        <div class="card max-w-md w-full animate-slideUp">
+            <div class="flex justify-between items-center border-b pb-3 mb-4 border-gray-200">
+                <h2 id="modal-title" class="text-xl font-bold font-montserrat text-primary">Modal Title</h2>
+                <button id="modal-close-btn" class="btn btn-ghost p-1 rounded-full text-gray-500 hover:text-gray-700">
+                    &times;
+                </button>
+            </div>
+            <div id="modal-content">
+                <!-- Modal content will be injected here -->
+            </div>
+        </div>
+    </div>
+
+
+    <!-- 
+    ==========================================
+    JAVASCRIPT
+    ==========================================
+    -->
+    <script>
+        // --- Mock Data ---
+        const MOCK_ACTIVITY = [
+          { employee: 'Alice Johnson', photo: 'AJ', location: 'Site 1', clockIn: '08:00 AM', clockOut: '05:00 PM', status: 'Verified', trustIndex: 98, hash: '0x8c7e...3d2f' },
+          { employee: 'Mark Wilson', photo: 'MW', location: 'Home', clockIn: '08:01 AM', clockOut: 'N/A', status: 'Out-of-Zone', trustIndex: 85, hash: '0x3a5b...1f7c' },
+          { employee: 'David Lee', photo: 'DL', location: 'Site 3', clockIn: '09:00 AM', clockOut: '06:00 PM', status: 'Verified', trustIndex: 92, hash: '0x1b2d...9h4a' },
+          { employee: 'Sarah Chen', photo: 'SC', location: 'Site 2', clockIn: '08:30 AM', clockOut: '04:30 PM', status: 'Verified', trustIndex: 95, hash: '0x7f8g...2k6p' },
+        ];
+        const MOCK_ATTENDANCE_PIE = [
+          { name: 'Verified', value: 320 },
+          { name: 'Out-of-Zone', value: 30 },
+          { name: 'Manual Review', value: 50 },
+        ];
+        const MOCK_TRENDS_DATA = [
+          { name: 'Mon', hours: 8.5 },
+          { name: 'Tue', hours: 8.2 },
+          { name: 'Wed', hours: 8.6 },
+          { name: 'Thu', hours: 9.1 },
+          { name: 'Fri', hours: 8.0 },
+        ];
+        const MOCK_HOURS_DATA = [
+          { name: 'Alice', hours: 45 },
+          { name: 'Mark', hours: 41 },
+          { name: 'David', hours: 48 },
+          { name: 'Sarah', hours: 38 },
+        ];
+        const COLORS = {
+          primary: '#004D40',
+          accent: '#C27C36',
+          secondary: '#69A197',
+          text: '#444B59',
+          background: '#F7FDFD',
+          error: '#EF4444',
+          success: '#10B981',
+          dark: {
+            text: '#E5E7EB',
+            grid: '#374151'
+          }
+        };
+
+        // --- Global State ---
+        let state = {
+            view: 'landing', // landing, employee, admin
+            page: 'dashboard', // for admin view
+            isInnovationMode: true,
+            isDarkMode: false,
+            
+            // Employee View State
+            clockedIn: false,
+            livenessStatus: 'inactive', // inactive, scanning, confirmed, failed
+            
+            // Modal State
+            showModal: false,
+            modalTitle: '',
+            modalContentHTML: '',
+        };
+
+        // --- Chart Instances ---
+        // We store chart instances to destroy them before re-rendering
+        let charts = {
+            attendancePie: null,
+            trustGauge: null,
+            dailyHoursTrend: null,
+            totalHoursBar: null,
+        };
+
+        // --- DOM Element References ---
+        const dom = {
+            html: document.documentElement,
+            landingPage: document.getElementById('landing-page'),
+            employeeView: document.getElementById('employee-view'),
+            adminView: document.getElementById('admin-view'),
+            adminContentArea: document.getElementById('admin-content-area'),
+            adminPageTitle: document.getElementById('admin-page-title'),
+            navItems: document.querySelectorAll('.nav-item'),
+            innovationToggle: document.getElementById('innovation-mode-toggle'),
+            innovationLabel: document.getElementById('innovation-mode-label'),
+            darkModeToggle: document.getElementById('dark-mode-toggle'),
+            modalContainer: document.getElementById('modal-container'),
+            modalTitle: document.getElementById('modal-title'),
+            modalContent: document.getElementById('modal-content'),
+            modalCloseBtn: document.getElementById('modal-close-btn'),
+            // Employee View Elements
+            employeeTime: document.getElementById('employee-time'),
+            employeeDate: document.getElementById('employee-date'),
+            livenessUI: document.getElementById('liveness-ui'),
+            gpsStatus: document.getElementById('gps-status'),
+            clockActionBtn: document.getElementById('clock-action-btn'),
+            clockStatus: document.getElementById('clock-status'),
+        };
+
+        // --- State Management ---
+        function setState(newState) {
+            // Merge new state into global state
+            state = { ...state, ...newState };
+            // Re-render the UI based on the new state
+            renderUI();
+        }
+
+        // --- Main UI Render Function ---
+        function renderUI() {
+            // 1. Update View (Page)
+            dom.landingPage.style.display = state.view === 'landing' ? 'flex' : 'none';
+            dom.employeeView.style.display = state.view === 'employee' ? 'flex' : 'none';
+            dom.adminView.style.display = state.view === 'admin' ? 'flex' : 'none';
+            
+            // 2. Update Dark Mode
+            if (state.isDarkMode) {
+                dom.html.classList.add('dark');
+                dom.darkModeToggle.innerHTML = `<i data-lucide="moon" class="w-5 h-5 text-white"></i>`;
+                dom.darkModeToggle.classList.remove('bg-accent');
+                dom.darkModeToggle.classList.add('bg-gray-600');
+            } else {
+                dom.html.classList.remove('dark');
+                dom.darkModeToggle.innerHTML = `<i data-lucide="sun" class="w-5 h-5 text-primary"></i>`;
+                dom.darkModeToggle.classList.add('bg-accent');
+                dom.darkModeToggle.classList.remove('bg-gray-600');
+            }
+
+            // 3. Update Admin View (if active)
+            if (state.view === 'admin') {
+                dom.adminPageTitle.textContent = state.page.toUpperCase().replace('-', ' & ');
+                
+                // Update active sidebar item
+                dom.navItems.forEach(item => {
+                    if (item.dataset.page === state.page) {
+                        item.classList.add('nav-item-active', 'bg-white/10', 'text-accent', 'font-bold', 'border-l-4', 'border-accent');
+                    } else {
+                        item.classList.remove('nav-item-active', 'bg-white/10', 'text-accent', 'font-bold', 'border-l-4', 'border-accent');
+                        item.classList.add('text-white/80', 'hover:bg-white/5');
+                    }
+                });
+                
+                // Update Innovation Mode toggle
+                dom.innovationToggle.checked = state.isInnovationMode;
+                if (state.isInnovationMode) {
+                    dom.innovationLabel.classList.add('text-accent');
+                    dom.innovationLabel.classList.remove('text-gray-500');
+                    dom.innovationToggle.nextElementSibling.classList.add('bg-accent');
+                    dom.innovationToggle.nextElementSibling.classList.remove('bg-gray-400');
+                } else {
+                    dom.innovationLabel.classList.remove('text-accent');
+                    dom.innovationLabel.classList.add('text-gray-500');
+                    dom.innovationToggle.nextElementSibling.classList.remove('bg-accent');
+                    dom.innovationToggle.nextElementSibling.classList.add('bg-gray-400');
+                }
+                
+                // Render the correct admin page content
+                renderAdminPageContent();
+            }
+            
+            // 4. Update Employee View (if active)
+            if (state.view === 'employee') {
+                renderEmployeeView();
+            }
+            
+            // 5. Update Modal
+            if (state.showModal) {
+                dom.modalTitle.textContent = state.modalTitle;
+                dom.modalContent.innerHTML = state.modalContentHTML;
+                dom.modalContainer.style.display = 'flex';
+            } else {
+                dom.modalContainer.style.display = 'none';
+            }
+
+            // 6. Render all icons - FIX: Add check for lucide definition
+            if (typeof lucide !== 'undefined' && lucide.createIcons) {
+                lucide.createIcons();
+            }
+        }
+
+        // --- Admin Page Content Renderer ---
+        function renderAdminPageContent() {
+            // Destroy any existing charts to prevent memory leaks
+            Object.values(charts).forEach(chart => chart?.destroy());
+            charts = {};
+
+            let contentHTML = '';
+            switch (state.page) {
+                case 'dashboard':
+                    contentHTML = getDashboardContent();
+                    break;
+                case 'reports':
+                    contentHTML = getReportsContent();
+                    break;
+                case 'about':
+                    contentHTML = getAboutContent();
+                    break;
+                default:
+                    contentHTML = getPlaceholderContent(state.page.replace('-', ' '));
+            }
+            dom.adminContentArea.innerHTML = contentHTML;
+            
+            // After injecting HTML, initialize charts for that page
+            if (state.page === 'dashboard') {
+                renderDashboardCharts();
+            }
+            if (state.page === 'reports') {
+                renderReportsCharts();
+            }
+            
+            // Re-add event listeners for any new buttons
+            addClickListeners();
+        }
+
+        // --- HTML Content Generators ---
+
+        function getDashboardContent() {
+            const innovationShowcaseHTML = state.isInnovationMode ? `
+            <div classclass="card innovation-showcase">
+                <h2 class="text-2xl font-bold font-montserrat mb-4 text-accent">Innovation Showcase: AI-Powered Trust</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="card p-4 border-l-4 border-success bg-gray-50">
+                        <div class="flex items-center space-x-3 mb-2">
+                            <i data-lucide="cpu" class="w-6 h-6 text-success"></i>
+                            <h3 class="font-bold text-lg">AI Liveness Detection</h3>
+                        </div>
+                        <p class="text-sm text-gray-600">Simulates real-time face/gesture analysis to prevent buddy punching.</p>
+                        <div class="mt-3 flex items-center justify-between text-xs font-semibold">
+                            <span class="text-success">Success Rate: 99.8%</span>
+                            <i data-lucide="loader" class="w-4 h-4 text-gray-400 animate-pulse"></i>
+                        </div>
+                    </div>
+                    <div class="card p-4 border-l-4 border-secondary bg-gray-50">
+                        <div class="flex items-center space-x-3 mb-2">
+                            <i data-lucide="map-pin" class="w-6 h-6 text-secondary"></i>
+                            <h3 class="font-bold text-lg">Adaptive Geofencing</h3>
+                        </div>
+                        <p class="text-sm text-gray-600">Dynamically adjusts zone size based on GPS variance, reducing false alerts.</p>
+                        <div class="mt-3 flex items-center justify-between text-xs font-semibold">
+                            <span class="text-secondary">Alert Reduction: 40%</span>
+                            <i data-lucide="zap" class="w-4 h-4 text-gray-400"></i>
+                        </div>
+                    </div>
+                    <div class="card p-4 border-l-4 border-accent bg-gray-50">
+                        <div class="flex items-center space-x-3 mb-2">
+                            <i data-lucide="trending-up" class="w-6 h-6 text-accent"></i>
+                            <h3 class="font-bold text-lg">Employee Trust Index</h3>
+                        </div>
+                        <p class="text-sm text-gray-600">Gamified score based on attendance history, compliance, and accuracy.</p>
+                        <div id="trust-index-gauge" class="h-40"></div>
+                    </div>
+                </div>
+            </div>` : '';
+
+            const activityTableRows = MOCK_ACTIVITY.map(activity => `
+                <tr class="table-row transition-colors duration-200 hover:bg-gray-50">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-primary">${activity.employee}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 table-text-muted">${activity.location}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 table-text-muted">${activity.clockIn}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold" style="color: ${activity.status === 'Verified' ? COLORS.success : (activity.status === 'Out-of-Zone' ? COLORS.error : COLORS.accent)}">
+                        ${activity.status}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 table-text-muted">${activity.trustIndex}%</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-500 table-text-muted">${activity.hash}</td>
+                </tr>
+            `).join('');
+
+            return `
+                <div class="space-y-8">
+                    <!-- 1. Summary Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <div class="card p-5 flex items-center justify-between border-b-4 border-success">
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">Verified Check-ins (Today)</p>
+                                <h3 class="text-3xl font-extrabold font-montserrat text-primary">289</h3>
+                            </div>
+                            <i data-lucide="check-square" class="w-8 h-8 opacity-20 text-success"></i>
+                        </div>
+                        <div class="card p-5 flex items-center justify-between border-b-4 border-error">
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">Out-of-Zone Alerts</p>
+                                <h3 class="text-3xl font-extrabold font-montserrat text-primary">4</h3>
+                            </div>
+                            <i data-lucide="zap" class="w-8 h-8 opacity-20 text-error"></i>
+                        </div>
+                        <div class="card p-5 flex items-center justify-between border-b-4 border-primary">
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">Payroll Estimate (Weekly)</p>
+                                <h3 class="text-3xl font-extrabold font-montserrat text-primary">$35,200</h3>
+                            </div>
+                            <i data-lucide="dollar-sign" class="w-8 h-8 opacity-20 text-primary"></i>
+                        </div>
+                        <div class="card p-5 flex items-center justify-between border-b-4 border-accent">
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">Average Trust Index</p>
+                                <h3 class="text-3xl font-extrabold font-montserrat text-primary">92.1%</h3>
+                            </div>
+                            <i data-lucide="trending-up" class="w-8 h-8 opacity-20 text-accent"></i>
+                        </div>
+                    </div>
+
+                    <!-- 2. Innovation Showcase -->
+                    ${innovationShowcaseHTML}
+
+                    <!-- 3. Core Analytics (Charts & Map) -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="card lg:col-span-2 p-4">
+                            <h2 class="text-xl font-bold font-montserrat mb-4 text-primary">Live Employee Locations (Simulated)</h2>
+                            <div class="placeholder-map bg-gray-200 rounded-xl flex flex-col items-center justify-center text-center h-80 text-gray-500">
+                                <i data-lucide="map-pin" class="w-6 h-6 mr-2"></i>
+                                Map Visualization Placeholder
+                                <p class="text-xs mt-2 text-gray-400">(*Map functionality for demo purposes)</p>
+                            </div>
+                            <div class="mt-3 flex justify-between">
+                                <p class="text-sm text-gray-500">Geofence Status: Adaptive & Active</p>
+                                <button data-action="showAnomalyModal" class="btn btn-ghost text-xs py-1">
+                                    View Anomaly Alerts
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card p-4">
+                            <h2 class="text-xl font-bold font-montserrat mb-4 text-primary">Attendance Breakdown</h2>
+                            <div id="attendance-pie-chart" class="h-[250px]"></div>
+                        </div>
+                    </div>
+
+                    <!-- 4. Recent Activity Table -->
+                    <div class="card">
+                        <h2 class="text-xl font-bold font-montserrat mb-4 text-primary">Recent Verified Activity</h2>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50 table-header">
+                                    <tr>
+                                        ${['Employee', 'Location', 'Clock-in Time', 'Status', 'Trust Index', 'Trust Chain Hash'].map(header => `
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                ${header}
+                                            </th>
+                                        `).join('')}
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200 table-body">
+                                    ${activityTableRows}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function getReportsContent() {
+            return `
+                <div class="space-y-8">
+                    <h1 class="text-3xl font-extrabold font-montserrat text-primary">Reports & Analytics</h1>
+                    <div class="card flex flex-col md:flex-row gap-4">
+                        <select class="input-field flex-grow p-2 rounded-lg border border-gray-300">
+                            <option>All Employees</option>
+                            <option>Field Team A</option>
+                            <option>HQ Staff</option>
+                        </select>
+                        <input type="date" class="input-field flex-grow p-2 rounded-lg border border-gray-300" value="2024-10-01">
+                        <input type="date" class="input-field flex-grow p-2 rounded-lg border border-gray-300" value="2024-10-31">
+                        <button class="btn btn-accent">Filter</button>
+                        <button class="btn btn-primary">Export CSV/PDF</button>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="card p-5 border-l-4 border-primary">
+                            <h2 class="text-xl font-bold font-montserrat mb-4 text-primary">Payroll Summary (Oct 2024)</h2>
+                            <div class="space-y-2 text-sm">
+                                <div class="flex justify-between border-b pb-1"><span>Total Billable Hours:</span> <span class="font-semibold text-lg">1,280 hrs</span></div>
+                                <div class="flex justify-between border-b pb-1"><span>Total Overtime:</span> <span class="font-semibold text-lg text-accent">115 hrs</span></div>
+                                <div class="flex justify-between border-b pb-1"><span>Anomalies Flagged:</span> <span class="font-semibold text-lg text-error">12</span></div>
+                                <div class="flex justify-between pt-2">
+                                    <span class="text-lg font-bold">Total Estimated Payout:</span>
+                                    <span class="text-2xl font-extrabold text-accent">$48,500</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card p-5">
+                            <h2 class="text-xl font-bold font-montserrat mb-4 text-primary">Daily Average Hours Trend</h2>
+                            <div id="daily-hours-chart" class="h-[250px]"></div>
+                        </div>
+                    </div>
+
+                    <div class="card p-5">
+                        <h2 class="text-xl font-bold font-montserrat mb-4 text-primary">Total Hours Worked by Employee (Last 7 Days)</h2>
+                        <div id="total-hours-chart" class="h-[300px]"></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function getAboutContent() {
+             return `
+                <div class="space-y-8">
+                    <h1 class="text-3xl font-extrabold font-montserrat text-primary">About GeoMint</h1>
+                    <div class="card p-6">
+                        <h2 class="text-2xl font-bold font-montserrat mb-4 text-accent">Minting Trust in Workplaces</h2>
+                        <p class="text-lg leading-relaxed text-gray-600">
+                            GeoMint leverages GPS, AI, and automation to ensure every attendance record is authentic, every work hour is fair, and every payout is accurate. We solve the costly problem of <strong>Buddy Punching</strong> and <strong>Time Fraud</strong> for companies managing large field teams.
+                        </p>
+                        <div class="mt-8 grid md:grid-cols-3 gap-6">
+                            <div class="p-4 border-l-4 border-success bg-gray-50 rounded-lg">
+                                <h3 class="font-bold text-lg">AI Verification</h3>
+                                <p class="text-sm text-gray-600">Stops fraud before it starts with liveness detection and photo verification.</p>
+                            </div>
+                            <div class="p-4 border-l-4 border-secondary bg-gray-50 rounded-lg">
+                                <h3 class="font-bold text-lg">Adaptive Geofencing</h3>
+                                <p class="text-sm text-gray-600">Smart zones reduce false alerts and support mobile/remote work flexibility.</p>
+                            </div>
+                            <div class="p-4 border-l-4 border-accent bg-gray-50 rounded-lg">
+                                <h3 class="font-bold text-lg">Predictive Payroll</h3>
+                                <p class="text-sm text-gray-600">Automated payroll calculation and anomaly flagging for HR efficiency.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card p-6">
+                        <h2 class="text-2xl font-bold font-montserrat mb-4 text-primary">Contact & Scale</h2>
+                        <p class="text-gray-600">
+                            GeoMint is designed for enterprise scaling. Contact our team to schedule a full backend integration demo.
+                        </p>
+                        <div class="mt-4 space-y-2">
+                            <p class="font-semibold">Email: <span class="text-accent">hello@geomint.io</span></p>
+                            <p class="font-semibold">HQ: San Francisco, CA</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function getPlaceholderContent(title) {
+            return `
+                <div class="space-y-8">
+                    <h1 class="text-3xl font-extrabold font-montserrat text-primary capitalize">${title}</h1>
+                    <div class="card p-10 text-center">
+                        <i data-lucide="clipboard" class="w-12 h-12 mx-auto mb-4 text-accent"></i>
+                        <h2 class="text-xl font-bold text-primary capitalize">This is the ${title} Management Page</h2>
+                        <p class="text-gray-600 mt-2">
+                            Here, HR managers would manage employee profiles, review raw attendance data, or finalize payroll batches.
+                        </p>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // --- Modal Content Generators ---
+        function showAnomalyModal() {
+            const content = `
+                <div>
+                    <h3 class="text-xl font-bold font-montserrat text-error mb-3">Open Anomaly Alerts (2)</h3>
+                    <div class="space-y-4">
+                        <div class="card border border-red-200 p-3">
+                            <p class="font-semibold text-primary">Out-of-Zone Clock-In</p>
+                            <p class="text-sm text-error mt-1">
+                                <strong>Mark Wilson (E-231F)</strong> clocked in at 08:01 AM from an unauthorized location (Home). Geofence check failed.
+                            </p>
+                            <button class="btn btn-danger mt-2 text-sm px-3 py-1">Flag for HR Review</button>
+                        </div>
+                        <div class="card border border-yellow-200 p-3">
+                            <p class="font-semibold text-primary">Potential Buddy Punching</p>
+                            <p class="text-sm text-accent mt-1">
+                                <strong>David Lee (E-559R)</strong> clocked in 3 seconds after Alice Johnson at the same terminal. Low Liveness score.
+                            </p>
+                            <button class="btn btn-accent mt-2 text-sm px-3 py-1">Request Liveness Audit</button>
+                        </div>
+                    </div>
+                    <button data-action="closeModal" class="btn btn-ghost mt-4 w-full">Close</button>
+                </div>`;
+            setState({ showModal: true, modalTitle: 'Anomaly Alerts', modalContentHTML: content });
+        }
+        
+        function showRewardModal() {
+            const content = `
+                <div class="text-center p-4">
+                    <i data-lucide="award" class="w-16 h-16 mx-auto text-accent animate-bounce"></i>
+                    <h3 class="text-2xl font-bold mt-4 font-montserrat text-primary">Achievement Unlocked!</h3>
+                    <p class="text-gray-600 mt-2">You earned the <strong>Early Bird</strong> badge for clocking in before 8:15 AM for five consecutive days.</p>
+                    <div class="mt-4 p-4 bg-gray-100 rounded-lg">
+                        <p class="font-semibold text-sm">Trust Score Progress</p>
+                        <div class="w-full bg-gray-200 rounded-full h-2.5 mt-2">
+                            <div class="h-2.5 rounded-full bg-success" style="width: 95%;"></div>
+                        </div>
+                        <p class="text-xs mt-1 text-gray-500">Next reward at 100% Trust Index!</p>
+                    </div>
+                    <button data-action="closeModal" class="btn btn-primary mt-6 w-full">View All Badges</button>
+                </div>`;
+             setState({ showModal: true, modalTitle: 'GeoMint Rewards', modalContentHTML: content });
+        }
+        
+        function closeModal() {
+            setState({ showModal: false });
+        }
+
+        // --- Chart Rendering Functions ---
+        
+        function getChartOptions(options) {
+            const isDark = state.isDarkMode;
+            const baseOptions = {
+                chart: {
+                    background: 'transparent',
+                    foreColor: isDark ? COLORS.dark.text : COLORS.text,
+                },
+                tooltip: {
+                    theme: isDark ? 'dark' : 'light',
+                },
+                grid: {
+                    borderColor: isDark ? COLORS.dark.grid : '#e0e0e0',
+                },
+                legend: {
+                    labels: {
+                        colors: isDark ? COLORS.dark.text : COLORS.text,
+                    },
+                },
+            };
+            // Deep merge options (simple version)
+            return { ...baseOptions, ...options };
+        }
+
+        function renderDashboardCharts() {
+            // 1. Attendance Pie Chart
+            const pieOptions = getChartOptions({
+                series: MOCK_ATTENDANCE_PIE.map(item => item.value),
+                labels: MOCK_ATTENDANCE_PIE.map(item => item.name),
+                colors: [COLORS.success, COLORS.error, COLORS.accent],
+                chart: { type: 'pie', height: 250 },
+                legend: { position: 'bottom' },
+                responsive: [{
+                    breakpoint: 480,
+                    options: {
+                        chart: {
+                            width: 200
+                        },
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }]
+            });
+            charts.attendancePie = new ApexCharts(document.querySelector("#attendance-pie-chart"), pieOptions);
+            charts.attendancePie.render();
+
+            // 2. Trust Index Gauge
+            if(state.isInnovationMode) {
+                const gaugeOptions = getChartOptions({
+                    series: [92],
+                    chart: { type: 'radialBar', height: 200 },
+                    plotOptions: {
+                        radialBar: {
+                            startAngle: -135,
+                            endAngle: 135,
+                            hollow: {
+                                margin: 0,
+                                size: '70%',
+                                background: 'transparent',
+                            },
+                            track: {
+                                background: state.isDarkMode ? COLORS.dark.grid : '#eee',
+                                strokeWidth: '97%',
+                            },
+                            dataLabels: {
+                                name: {
+                                    show: false,
+                                },
+                                value: {
+                                    formatter: (val) => val + "%",
+                                    fontSize: '24px',
+                                    fontWeight: 'bold',
+                                    color: COLORS.accent,
+                                    offsetY: 10,
+                                },
+                            },
+                        },
+                    },
+                    fill: {
+                        colors: [COLORS.accent],
+                    },
+                    stroke: {
+                        lineCap: 'round'
+                    },
+                });
+                charts.trustGauge = new ApexCharts(document.querySelector("#trust-index-gauge"), gaugeOptions);
+                charts.trustGauge.render();
+            }
+        }
+        
+        function renderReportsCharts() {
+            const isDark = state.isDarkMode;
+            
+            // 1. Daily Average Hours Trend
+            const lineOptions = getChartOptions({
+                series: [{
+                    name: 'Avg Hours',
+                    data: MOCK_TRENDS_DATA.map(d => d.hours)
+                }],
+                chart: { type: 'line', height: 250, zoom: { enabled: false }, toolbar: { show: false } },
+                colors: [COLORS.primary],
+                stroke: { width: 3, curve: 'smooth' },
+                xaxis: {
+                    categories: MOCK_TRENDS_DATA.map(d => d.name),
+                    labels: { style: { colors: isDark ? COLORS.dark.text : COLORS.text } }
+                },
+                yaxis: {
+                    title: { text: 'Hours', style: { color: isDark ? COLORS.dark.text : COLORS.text } },
+                    labels: { style: { colors: isDark ? COLORS.dark.text : COLORS.text } }
+                },
+                markers: {
+                    size: 5,
+                    colors: [COLORS.accent],
+                    strokeColors: COLORS.accent,
+                    hover: {
+                        size: 7
+                    }
+                }
+            });
+            charts.dailyHoursTrend = new ApexCharts(document.querySelector("#daily-hours-chart"), lineOptions);
+            charts.dailyHoursTrend.render();
+            
+            // 2. Total Hours Bar Chart
+            const barOptions = getChartOptions({
+                 series: [{
+                    name: 'Total Hours',
+                    data: MOCK_HOURS_DATA.map(d => d.hours)
+                }],
+                chart: { type: 'bar', height: 300, toolbar: { show: false } },
+                colors: [COLORS.primary],
+                plotOptions: {
+                    bar: {
+                        borderRadius: 10,
+                        horizontal: false,
+                        columnWidth: '50%',
+                    },
+                },
+                xaxis: {
+                    categories: MOCK_HOURS_DATA.map(d => d.name),
+                    labels: { style: { colors: isDark ? COLORS.dark.text : COLORS.text } }
+                },
+                yaxis: {
+                    title: { text: 'Hours', style: { color: isDark ? COLORS.dark.text : COLORS.text } },
+                    labels: { style: { colors: isDark ? COLORS.dark.text : COLORS.text } }
+                },
+                dataLabels: { enabled: false },
+            });
+            charts.totalHoursBar = new ApexCharts(document.querySelector("#total-hours-chart"), barOptions);
+            charts.totalHoursBar.render();
+        }
+        
+        // --- Employee View Logic ---
+        function startEmployeeViewTimer() {
+            function updateTime() {
+                if (state.view !== 'employee') return; // Stop timer if view changes
+                const now = new Date();
+                dom.employeeTime.textContent = now.toLocaleTimeString();
+                dom.employeeDate.textContent = now.toDateString();
+                requestAnimationFrame(updateTime);
+            }
+            updateTime();
+        }
+        
+        function renderEmployeeView() {
+            // Update Clock Button
+            if (state.livenessStatus === 'scanning') {
+                dom.clockActionBtn.innerHTML = `<i data-lucide="loader" class="inline w-5 h-5 mr-2 animate-spin"></i> Verifying...`;
+                dom.clockActionBtn.disabled = true;
+            } else if (state.clockedIn) {
+                dom.clockActionBtn.innerHTML = `<i data-lucide="log-out" class="inline w-5 h-5 mr-2"></i> Clock Out`;
+                dom.clockActionBtn.className = 'btn btn-danger w-full text-lg py-4 shadow-lg';
+                dom.clockActionBtn.disabled = false;
+            } else {
+                dom.clockActionBtn.innerHTML = `<i data-lucide="clock" class="inline w-5 h-5 mr-2"></i> Clock In`;
+                dom.clockActionBtn.className = 'btn btn-accent w-full text-lg py-4 shadow-lg';
+                dom.clockActionBtn.disabled = false;
+            }
+            
+            // Update Liveness UI
+            let livenessHTML = '';
+            switch (state.livenessStatus) {
+                case 'scanning':
+                    livenessHTML = `
+                        <div class="flex flex-col items-center justify-center h-full bg-black/80 text-white p-4 text-center">
+                            <i data-lucide="loader" class="w-12 h-12 animate-spin text-accent"></i>
+                            <p class="mt-3 font-semibold">AI Liveness Check: Nod Your Head Now</p>
+                            <p class="text-sm text-gray-400">(Simulating movement gesture verification)</p>
+                        </div>`;
+                    break;
+                case 'confirmed':
+                    livenessHTML = `
+                        <div class="flex flex-col items-center justify-center h-full bg-success/90 text-white">
+                            <i data-lucide="check-square" class="w-12 h-12"></i>
+                            <p class="mt-3 font-bold">Liveness Confirmed!</p>
+                        </div>`;
+                    break;
+                case 'failed':
+                     livenessHTML = `
+                        <div class="flex flex-col items-center justify-center h-full bg-error/90 text-white">
+                            <i data-lucide="zap" class="w-12 h-12"></i>
+                            <p class="mt-3 font-bold">Liveness Failed / Tamper Detected</p>
+                        </div>`;
+                    break;
+                default: // inactive
+                     livenessHTML = `
+                        <div class="flex items-center justify-center h-full bg-gray-900 text-gray-500">
+                            <i data-lucide="user" class="w-10 h-10 mr-2"></i>
+                            Webcam Inactive (Ready for AI Scan)
+                        </div>`;
+            }
+            dom.livenessUI.innerHTML = livenessHTML;
+        }
+        
+        function handleClockAction() {
+            if (state.clockedIn) {
+                // --- Clock Out ---
+                setState({ livenessStatus: 'inactive' });
+                dom.clockStatus.textContent = 'Clocking Out...';
+                dom.clockStatus.className = 'text-center mt-4 text-sm font-medium text-gray-500';
+                dom.gpsStatus.textContent = 'Location Status: Verifying...';
+                dom.gpsStatus.className = 'text-center font-semibold text-sm mb-6 text-gray-500';
+                
+                setTimeout(() => {
+                    setState({ clockedIn: false });
+                    dom.clockStatus.textContent = 'Clocked Out. Have a great evening!';
+                }, 1500);
+                return;
+            }
+
+            // --- Clock In ---
+            setState({ livenessStatus: 'scanning' });
+            dom.clockStatus.textContent = 'Initiating AI & GPS Verification...';
+            dom.gpsStatus.textContent = 'Location Status: Verifying...';
+            dom.gpsStatus.className = 'text-center font-semibold text-sm mb-6 text-gray-500';
+
+            setTimeout(() => {
+                const isOutOfZone = Math.random() < 0.1;
+
+                if (isOutOfZone) {
+                    dom.gpsStatus.textContent = 'Out of Work Zone! Clock-In Denied.';
+                    dom.gpsStatus.className = 'text-center font-semibold text-sm mb-6 text-error';
+                    setState({ livenessStatus: 'failed' });
+                    dom.clockStatus.textContent = 'Verification Failed.';
+                } else {
+                    dom.gpsStatus.textContent = 'Location Verified: Site A (In-Zone)';
+                    dom.gpsStatus.className = 'text-center font-semibold text-sm mb-6 text-success';
+                    setState({ livenessStatus: 'confirmed' });
+                    dom.clockStatus.textContent = 'AI Liveness Check Complete.';
+
+                    setTimeout(() => {
+                        setState({ clockedIn: true });
+                        dom.clockStatus.textContent = 'Clocked In Successfully!';
+                        dom.clockStatus.className = 'text-center mt-4 text-sm font-medium text-success';
+                        showRewardModal();
+                    }, 1500);
+                }
+            }, 2500);
+        }
+
+        // --- Event Listeners ---
+        function addClickListeners() {
+            document.querySelectorAll('[data-action]').forEach(element => {
+                // Remove old listener to prevent duplicates
+                element.replaceWith(element.cloneNode(true));
+            });
+            
+            document.querySelectorAll('[data-action]').forEach(element => {
+                element.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const action = e.currentTarget.dataset.action;
+                    const view = e.currentTarget.dataset.view;
+                    const page = e.currentTarget.dataset.page;
+
+                    switch (action) {
+                        case 'setView':
+                            setState({ view: view, page: view === 'admin' ? 'dashboard' : state.page });
+                            if (view === 'employee') {
+                                startEmployeeViewTimer();
+                            }
+                            break;
+                        case 'setPage':
+                            setState({ page: page });
+                            break;
+                        case 'showAnomalyModal':
+                            showAnomalyModal();
+                            break;
+                        case 'closeModal':
+                            closeModal();
+                            break;
+                    }
+                });
+            });
+        }
+        
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Add initial click listeners
+            addClickListeners();
+
+            // Modal close button
+            dom.modalCloseBtn.addEventListener('click', closeModal);
+            
+            // Employee view clock-in button
+            dom.clockActionBtn.addEventListener('click', handleClockAction);
+            
+            // Admin Toggles
+            dom.innovationToggle.addEventListener('change', (e) => {
+                setState({ isInnovationMode: e.target.checked });
+            });
+            dom.darkModeToggle.addEventListener('click', () => {
+                setState({ isDarkMode: !state.isDarkMode });
+            });
+            
+            // Initial Render
+            renderUI();
+        });
+
+    </script>
+</body>
+</html>
